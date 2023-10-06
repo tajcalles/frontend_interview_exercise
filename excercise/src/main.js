@@ -7,7 +7,11 @@ import App from './App';
 import vuetify from './plugins/vuetify';
 import 'vuetify/dist/vuetify.min.css';
 import '@/assets/css/variables.css';
+import ShotInfo from './components/ShotInfo.vue';
+import Sidebar from './components/Sidebar.vue';
 
+Vue.component('ShotInfo', ShotInfo);
+Vue.component('Sidebar', Sidebar);
 Vue.use(Vuetify);
 Vue.config.productionTip = false;
 Vue.use(Vuex);

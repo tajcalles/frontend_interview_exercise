@@ -9,17 +9,56 @@
           src="/trugolf_logo.png"
         ></v-img>
       </v-toolbar-title>
+      <v-divider
+        class="mx-4"
+        vertical
+      ></v-divider>
+      <v-toolbar-title>
+        <h3>Scorecard</h3>
+      </v-toolbar-title>
     </v-app-bar>
     <v-main>
-
       <v-container>
         <v-card>
           <v-card-title>
             <div>
-              <h2>{{ roundInfo.courseName }}</h2>
+              <h3>{{ roundInfo.courseName + " " + new Date(this.shots[0].createdAt).toLocaleDateString()}}</h3>
             </div>
           </v-card-title>
-          <v-data-table
+          <v-tabs color="green">
+            <v-tab
+              href="#tab-1"
+              ripple>
+              Data Table
+            </v-tab>
+            <v-tab 
+              href="#tab-2"
+              ripple>
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <span
+                    v-bind="attrs"
+                    v-on="on"
+                  >Trajectory 3D Model</span>
+                </template>
+                <span>Coming soon!</span>
+              </v-tooltip>
+            </v-tab>
+          </v-tabs>
+          <v-tabs-items v-model="tab">
+            <v-tab-item
+              v-for="i in 2"
+              :key="i"
+              :value="'tab-' + i"
+            >
+          </v-tab-item>
+          <v-tab-item>
+            <v-card flat>
+              {{ tab }}
+            </v-card>
+          </v-tab-item>
+        </v-tabs-items>
+        <v-data-table
           :headers="headers"
           :items="shots"
           :loading = "isLoading"
@@ -28,23 +67,10 @@
           loading-text="Loading... Please wait"
           :expanded.sync="expanded"
           :item-key="shots.id"
-          show-expand
-          >
-          <template v-slot:top>
-            <!-- <v-toolbar flat>
-              <v-spacer></v-spacer>
-              <v-text-field
-              v-model="search"
-              append-icon="mdi-magnify"
-              label="Search"
-              single-line
-              hide-details
-              ></v-text-field>
-            </v-toolbar> -->
-          </template>
+          show-expand>
           <template v-slot:expanded-item="{ headers, item }">
             <td :colspan="headers.length">
-              More info about shot # {{ item.shotIndex }}
+              <ShotInfo :shot="item" />
             </td>
           </template>
         </v-data-table>
@@ -56,7 +82,8 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex';
-
+import ShotInfo from './components/ShotInfo.vue';
+import Sidebar from './components/Sidebar.vue';
 export default {
   computed: {
     ...mapGetters('shots', ['shotList']),
@@ -78,7 +105,7 @@ export default {
         shot.launchBackSpin = shot.launchBackSpin.toFixed(2);
         shot.launchAngle = shot.launchAngle.toFixed(2);
       });
-    }
+    },
 
   },
   data() {
@@ -98,6 +125,7 @@ export default {
       roundInfo: {},
       expanded: [],
       isLoading: true,
+      tab: null,
     }
   },
   mounted () {
@@ -113,14 +141,13 @@ export default {
       });
     this.getRoundData()
       .then(() => {
-        this.roundInfo = this.roundData
+        this.roundInfo = this.roundData;
         this.isLoading = false;
       })
       .catch((error) => {
         console.error('Error loading data:', error);
         this.isLoading = false;
       });
-      console.log(this.roundInfo)
   },
 };
 </script>

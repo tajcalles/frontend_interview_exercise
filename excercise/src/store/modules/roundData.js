@@ -29,7 +29,7 @@ const actions = {
     commit(GET_ROUND_DATA);
 
     try {
-      response = await API.roundDataStore.roundDataStore();
+      response = await API.roundData.roundDataStore();
     } catch (err) {
       response = err;
     }
