@@ -1,22 +1,56 @@
 <template>
   <v-app>
-    <v-container>
-      <v-card>
-        <v-card-title>
-          <div>
-            <h2>Scorecard</h2>
-          </div>
-        </v-card-title>
-        <v-data-table
+    <v-app-bar app color="darkWhite">
+      <v-toolbar-title>
+        <v-img
+          lazy-src="/trugolf_logo.png"
+          max-height=""
+          max-width="225"
+          src="/trugolf_logo.png"
+        ></v-img>
+      </v-toolbar-title>
+    </v-app-bar>
+    <v-main>
+
+      <v-container>
+        <v-card>
+          <v-card-title>
+            <div>
+              <h2>{{ roundInfo.courseName }}</h2>
+            </div>
+          </v-card-title>
+          <v-data-table
           :headers="headers"
           :items="shots"
           :loading = "isLoading"
           :items-per-page="15"
           class="elevation-1"
           loading-text="Loading... Please wait"
-        ></v-data-table>
+          :expanded.sync="expanded"
+          :item-key="shots.id"
+          show-expand
+          >
+          <template v-slot:top>
+            <!-- <v-toolbar flat>
+              <v-spacer></v-spacer>
+              <v-text-field
+              v-model="search"
+              append-icon="mdi-magnify"
+              label="Search"
+              single-line
+              hide-details
+              ></v-text-field>
+            </v-toolbar> -->
+          </template>
+          <template v-slot:expanded-item="{ headers, item }">
+            <td :colspan="headers.length">
+              More info about shot # {{ item.shotIndex }}
+            </td>
+          </template>
+        </v-data-table>
       </v-card>
     </v-container>
+  </v-main>
   </v-app>
 </template>
 
@@ -26,9 +60,11 @@ import { mapGetters, mapActions } from 'vuex';
 export default {
   computed: {
     ...mapGetters('shots', ['shotList']),
+    ...mapGetters('roundData', ['roundData']),
   },
   methods: {
     ...mapActions('shots', ['allShots']),
+    ...mapActions('roundData', ['getRoundData']),
 
     modifyShotData() {
       this.shots.forEach(shot => {
@@ -59,6 +95,8 @@ export default {
       ],
       shotData: {},
       shots: [],
+      roundInfo: {},
+      expanded: [],
       isLoading: true,
     }
   },
@@ -73,6 +111,16 @@ export default {
         console.error('Error loading data:', error);
         this.isLoading = false;
       });
+    this.getRoundData()
+      .then(() => {
+        this.roundInfo = this.roundData
+        this.isLoading = false;
+      })
+      .catch((error) => {
+        console.error('Error loading data:', error);
+        this.isLoading = false;
+      });
+      console.log(this.roundInfo)
   },
 };
 </script>
